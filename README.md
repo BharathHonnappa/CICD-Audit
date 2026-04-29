@@ -204,8 +204,3 @@ cicd-auditor/
 ## Author
 
 Bharath H
-Cybersecurity student | HTB Global Rank #666 | Season 11 Rank #248 / 12,000+
-Focused on DFIR, network security, and DevSecOps
-
-GitHub: https://github.com/BharathHonnappa
-LinkedIn: https://www.linkedin.com/in/bharath-h-632500297/

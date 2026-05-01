@@ -3,7 +3,6 @@ Core auditor — fetches GitHub repo data and orchestrates all checks.
 """
 
 import base64
-import token
 import yaml
 import requests
 from auditor.checks import (
@@ -25,11 +24,11 @@ class PipelineAuditor:
         self.token = token
         self.reporter = reporter
         self.headers = {
+            "Authorization": f"Bearer {token}",
             "Accept": "application/vnd.github+json",
             "X-GitHub-Api-Version": "2022-11-28",
         }
-        if token:
-            self.headers["Authorization"] = f"Bearer {token}"
+        self._validate_repo()
 
     def _validate_repo(self):
         if "/" not in self.repo or self.repo.count("/") != 1:
@@ -107,7 +106,8 @@ class PipelineAuditor:
         findings += check_unpinned_actions.run(workflows)
         findings += check_overpermissioned_tokens.run(workflows)
         findings += check_missing_sast.run(workflows)
-        findings += check_branch_protection.run(protection, default_branch)
+        is_private = repo_info.get("private", False)
+        findings += check_branch_protection.run(protection, default_branch, is_private)
         findings += check_iam_least_privilege.run(workflows, repo_info)
 
         return findings

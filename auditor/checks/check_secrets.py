@@ -6,7 +6,11 @@ in workflow YAML instead of using GitHub Secrets.
 
 import re
 
-# Pattern: (label, regex, severity)
+# NOTE: This uses regex pattern matching, not entropy analysis.
+# It will produce false positives on things that look like secrets but aren't
+# (e.g. placeholder passwords, test credentials, example values).
+# Tools like Gitleaks and TruffleHog use entropy-based detection which is
+# significantly more accurate. Verify every finding manually before acting on it.
 SECRET_PATTERNS = [
     ("AWS Access Key",         r"AKIA[0-9A-Z]{16}",                                  "critical"),
     ("AWS Secret Key",         r"(?i)aws.{0,20}secret.{0,20}['\"][0-9a-zA-Z/+]{40}['\"]", "critical"),

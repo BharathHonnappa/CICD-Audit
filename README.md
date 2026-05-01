@@ -22,7 +22,7 @@ Known gaps: script injection detection, cross-workflow analysis, GitLab/Bitbucke
 
 ---
 
-## How It Works — File Breakdown
+## File Breakdown
 
 ```
 cicd-auditor/

@@ -1,24 +1,41 @@
 """
 Check: Branch protection rules on the default branch.
 
-Pipeline integrity depends on protecting the branch that triggers
-production deployments. Missing branch protection lets anyone push
-directly to main — bypassing all CI security checks.
+Severity is context-aware:
+- Private repos: missing branch protection is CRITICAL — direct pushes bypass
+  all security controls on production code in a company setting.
+- Public repos: flagged as MEDIUM — commonly intentional in open source projects
+  where maintainers prioritize velocity over strict review gates.
 """
 
 
-def run(protection: dict | None, branch: str) -> list[dict]:
+def run(protection: dict | None, branch: str, is_private: bool = False) -> list[dict]:
     findings = []
 
     if protection is None:
+        if is_private:
+            severity = "critical"
+            context = (
+                "This is a private repository — direct pushes to the default branch "
+                "bypass all CI/CD security checks and code review. "
+                "Any compromised account with push access can deploy directly to production."
+            )
+        else:
+            severity = "medium"
+            context = (
+                "This is a public repository — missing branch protection is common "
+                "in open source projects by design. If this repo deploys to production, "
+                "consider enabling branch protection."
+            )
+
         findings.append({
             "check": "Branch Protection",
-            "severity": "critical",
+            "severity": severity,
             "file": f"branch: {branch}",
             "line": None,
             "detail": (
                 f"No branch protection rules found on '{branch}'. "
-                "Direct pushes are allowed, bypassing all CI/CD security checks."
+                f"Direct pushes are allowed. {context}"
             ),
             "snippet": None,
             "remediation": (
